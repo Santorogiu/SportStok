@@ -24,10 +24,7 @@ export default function Header() {
             sair <LogOut className="size-3" />
           </a>
         </div>
-        <CircleUserRound
-          strokeWidth={1.6}
-          className="size-10 md:size-12 text-indigo-600"
-        />
+        <div className="inline-flex justify-center items-center size-10 md:size-12 border-2 border-indigo-600 rounded-full text-2xl text-indigo-600 uppercase">{user.name[0]}</div>
       </div>
     </header>
   );

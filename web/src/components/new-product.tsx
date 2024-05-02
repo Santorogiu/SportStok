@@ -70,8 +70,8 @@ export default function NewProductForm() {
           {
             name: data.name,
             imageUrl,
-            quantity: data.quantity,
-            size: data.size,
+            quantity: data.quantity.toString(),
+            size: data.size.toString(),
             color: data.color,
             categoryId: category,
           },
@@ -140,17 +140,18 @@ export default function NewProductForm() {
   }, []);
 
   return (
-    <div className="relative container h-full flex flex-1 justify-center items-center">
-      <Button
-        onClick={() => {
-          router.push("/");
-        }}
-        className="absolute left-0 top-8"
-        variant="outline"
-        size="icon"
-      >
-        <ArrowLeft className="size-4" />
-      </Button>
+    <div className="relative container h-full flex flex-col flex-1 justify-center items-center p-3 gap-2">
+      <div className="inline-flex justify-start w-full">
+        <Button
+          onClick={() => {
+            router.push("/");
+          }}
+          variant="ghost"
+          size="icon"
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+      </div>
 
       <form
         ref={formRef}
@@ -162,7 +163,7 @@ export default function NewProductForm() {
             <img
               src={preview}
               alt="preview"
-              className="aspect-video w-full rounded-lg object-cover shadow-lg"
+              className="aspect-square flex w-full h-80 rounded-xl object-cover shadow-sm"
             />
             <Trash2
               onClick={() => {

@@ -22,23 +22,23 @@ export default function Stook() {
   }, []);
 
   return (
-    <div className="container">
+    <div className="container flex-col items-center justify-center gap-2">
       <div className="w-full flex justify-between items-center">
         <p className="text-base text-zinc-400">Estoque</p>
         <div className="flex gap-4">
           <Button
-            variant="outline"
+            variant="ghost"
             type="submit"
             onClick={() => {
               router.push("/products/new");
             }}
           >
-            Novo produto <Plus className="ml-2 size-4" />
+            Adicionar <Plus className="ml-2 size-4" />
           </Button>
         </div>
       </div>
 
-      <div className="w-full flex flex-wrap gap-5 py-3 md:py-6">
+      <div className="w-full flex items-center justify-center flex-wrap gap-3 py-3 md:py-6">
         {products.map((product) => {
           return <Card key={product.id} product={product} />;
         })}

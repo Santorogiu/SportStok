@@ -19,11 +19,12 @@ import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
+import toast from "react-hot-toast";
 
 export default function EditProductForm({ id }: { id: string }) {
   const [product, setProduct] = useState<Product>();
   const [categorys, setCategorys] = useState<Category[]>([]);
-  const { register, handleSubmit } = useForm<Product>();
+  const { register, handleSubmit, setValue } = useForm<Product>();
   const [isLoading, setIsLoading] = useState(false);
 
   const [category, setCategory] = useState("");
@@ -31,7 +32,67 @@ export default function EditProductForm({ id }: { id: string }) {
   const router = useRouter();
   const token = Cookie.get("token");
 
-  const onSubmit = async (data: Product) => {};
+  const onSubmit = async (data: Product) => {
+    if (!data.name || !category || !data.size || !data.quantity) {
+      return toast.error("Preencha todos os dados!", {
+        style: {
+          background: "#4F46E5",
+          color: "#E5E5E5",
+        },
+        iconTheme: {
+          primary: "#E5E5E5",
+          secondary: "#4F46E5",
+        },
+      });
+    }
+
+    setIsLoading(!isLoading);
+
+      try {
+        await api.put(
+        `/product/${product?.id}`,
+          {
+            name: data.name,
+            quantity: data.quantity.toString(),
+            size: data.size.toString(),
+            color: data.color,
+            categoryId: category,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        toast.success("Produto editado", {
+          style: {
+            background: "#4F46E5",
+            color: "#E5E5E5",
+          },
+          iconTheme: {
+            primary: "#E5E5E5",
+            secondary: "#4F46E5",
+          },
+        });
+
+        return router.push('/')
+      } catch (e) {
+        return toast.error("Erro ao editar produto", {
+          style: {
+            background: "#4F46E5",
+            color: "#E5E5E5",
+          },
+          iconTheme: {
+            primary: "#E5E5E5",
+            secondary: "#4F46E5",
+          },
+        });
+      }finally{
+        setIsLoading(!!isLoading)
+      }
+  };
 
   const getProduct = async () => {
     const response = await api.get(`/product/${id}`, {
@@ -42,6 +103,13 @@ export default function EditProductForm({ id }: { id: string }) {
     });
 
     setProduct(response.data);
+
+    setValue("name", response.data.name);
+    setValue("quantity", response.data.quantity);
+    setValue("size", response.data.size);
+    setValue("color", response.data.color);
+
+    setCategory(response.data.categoryId)
   };
 
   const getCategorys = async () => {
@@ -56,22 +124,23 @@ export default function EditProductForm({ id }: { id: string }) {
   };
 
   useEffect(() => {
-    getProduct();
     getCategorys();
+    getProduct();
   }, []);
 
   return (
-    <div className="relative container h-full flex flex-1 justify-center items-center">
-      <Button
-        onClick={() => {
-          router.push("/");
-        }}
-        className="absolute left-0 top-8"
-        variant="outline"
-        size="icon"
-      >
-        <ArrowLeft className="size-4" />
-      </Button>
+    <div className="relative container h-full flex flex-col flex-1 justify-center items-center p-3 gap-2">
+      <div className="inline-flex justify-start w-full">
+        <Button
+          onClick={() => {
+            router.push("/");
+          }}
+          variant="ghost"
+          size="icon"
+        >
+          <ArrowLeft className="size-4" />
+        </Button>
+      </div>
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -80,12 +149,10 @@ export default function EditProductForm({ id }: { id: string }) {
         <img
           src={product?.imageUrl}
           alt="preview"
-          className="aspect-video w-full rounded-lg object-cover shadow-lg"
+          className="aspect-square flex w-full h-72 rounded-xl object-cover shadow-sm"
         />
-
         <Input
           type="text"
-          value={product?.name}
           placeholder="Nome"
           {...register("name")}
         />
@@ -93,17 +160,16 @@ export default function EditProductForm({ id }: { id: string }) {
         <div className="w-full flex gap-2">
           <Input
             type="number"
-            value={product?.quantity}
             placeholder="Quantidade"
             {...register("quantity")}
           />
+
           <Select
             onValueChange={setCategory}
-            value={category}
-            defaultValue={product?.categoryId}
+            value={category} 
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Categoria" />
+              <SelectValue placeholder='Categoria'/>
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -124,13 +190,11 @@ export default function EditProductForm({ id }: { id: string }) {
         <div className="w-full flex gap-2">
           <Input
             type="number"
-            value={product?.size}
             placeholder="Tamanho"
             {...register("size")}
           />
           <Input
             type="text"
-            value={product?.color}
             placeholder="Cor"
             {...register("color")}
           />

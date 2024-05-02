@@ -6,12 +6,15 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Product } from "../types/Product";
 import { Button } from "./ui/button";
+import Cookie from "js-cookie";
 
 export default function Card({ product }: { product: Product }) {
   const router = useRouter();
 
   const [quantity, setQuantity] = useState(product.quantity);
   const [isLoading, setIsLoading] = useState(false);
+
+  const token = Cookie.get("token");
 
   const handleDelete = async () => {
     setIsLoading(true);
@@ -46,6 +49,76 @@ export default function Card({ product }: { product: Product }) {
     }
   };
 
+  const handlePlus = async () => {
+    try {
+     setQuantity(quantity + 1);
+     const realValue = quantity + 1;
+     return api.put(
+        `/product/${product?.id}`,
+          {
+            name: product.name,
+            quantity: realValue.toString(),
+            size: product.size?.toString(),
+            color: product.color,
+            categoryId: product.categoryId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+    } catch (error) {
+      console.log(error);
+      return toast.error("Erro ao aumentar quantidade!", {
+        style: {
+          background: "#4F46E5",
+          color: "#E5E5E5",
+        },
+        iconTheme: {
+          primary: "#E5E5E5",
+          secondary: "#4F46E5",
+        },
+      });
+    }
+  };
+
+  const handleMinus = async () => {
+    try {
+      setQuantity(quantity - 1);
+      const realValue = quantity - 1;
+      return api.put(
+        `/product/${product.id}`,
+          {
+            name: product.name,
+            quantity: realValue.toString(),
+            size: product.size?.toString(),
+            color: product.color,
+            categoryId: product.categoryId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+    } catch (error) {
+      console.log(error);
+      return toast.error("Erro ao diminuir quantidade!", {
+        style: {
+          background: "#4F46E5",
+          color: "#E5E5E5",
+        },
+        iconTheme: {
+          primary: "#E5E5E5",
+          secondary: "#4F46E5",
+        },
+      });
+    }
+  };
+
   return (
     <div className="w-full sm:w-64 md:w-80 flex flex-col gap-2 p-3 rounded-2xl shadow-md bg-white">
       <Image
@@ -64,7 +137,8 @@ export default function Card({ product }: { product: Product }) {
           <Button
             className="w-8 h-8 rounded-full flex justify-center items-center"
             size="icon"
-            onClick={() => setQuantity(quantity - 1)}
+            disabled={quantity < 1}
+            onClick={handleMinus}
           >
             <Minus className="size-3" />
           </Button>
@@ -76,7 +150,7 @@ export default function Card({ product }: { product: Product }) {
           <Button
             className="w-8 h-8 rounded-full flex justify-center items-center"
             size="icon"
-            onClick={() => setQuantity(quantity + 1)}
+            onClick={handlePlus}
           >
             <Plus className="size-3" />
           </Button>

@@ -8,6 +8,7 @@ import { authRoutes } from "./routes/auth";
 import { categoryRoutes } from "./routes/category";
 import { productsRoutes } from "./routes/products";
 import { uploadRoutes } from "./routes/upload";
+import jwt from "@fastify/jwt";
 
 const app = fastify();
 
@@ -22,6 +23,10 @@ app.register(cors, {
   origin: true,
 });
 
+app.register(jwt, {
+  secret: "agenda",
+});
+
 app.register(authRoutes);
 app.register(uploadRoutes);
 app.register(productsRoutes);
@@ -29,8 +34,7 @@ app.register(categoryRoutes);
 
 app
   .listen({
-    port: 3333,
-    host: "0.0.0.0",
+    port: 3333
   })
   .then(() => {
     console.log("🚀 HTTP server running on port http://localhost:3333");

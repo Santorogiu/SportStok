@@ -20,7 +20,15 @@ Para instalar, siga os passos abaixo:
 
 1. Faça uma cópia do repositório em sua máquina.
 
-2. No terminal, para cada diretório, execute:
+2. Configure o arquivo .env conforme necessário.
+
+- Para o diretório 'server', configure o arquivo .env com o seguinte conteúdo:
+
+```
+DATABASE_URL=file:./dev.db
+```
+
+3. No terminal, para cada diretório, execute:
 
 ```
 npm install

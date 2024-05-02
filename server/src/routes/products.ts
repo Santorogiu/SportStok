@@ -75,6 +75,46 @@ export async function productsRoutes(app: FastifyInstance) {
     return product;
   });
 
+  app.put('/product/:id', async (request, reply) => {
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { id } = paramsSchema.parse(request.params)
+
+    const bodySchema = z.object({
+      name: z.string(),
+      quantity: z.string(),
+      size: z.string(),
+      color: z.string(),
+      categoryId: z.string(),
+    });
+
+    const { name, quantity, size, color, categoryId } =
+      bodySchema.parse(request.body);
+
+    let product = await prisma.product.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    })
+
+    product = await prisma.product.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        quantity: parseInt(quantity),
+        size: parseInt(size),
+        color,
+        categoryId,
+      },
+    })
+
+    return product
+  })
+
   app.delete("/product/:id", async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),

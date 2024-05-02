@@ -18,11 +18,19 @@ export async function authRoutes(app: FastifyInstance) {
       },
     });
 
-    return {
-      token: {
+    const token = app.jwt.sign(
+      {
         id: user.id,
-        name: user.name,
+        name: user.name
       },
+      {
+        sub: user.id,
+        expiresIn: "10 days",
+      }
+    );
+
+    return {
+      token
     };
   });
 }
